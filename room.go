@@ -14,6 +14,7 @@ type Room struct {
 	Name             string
 	Participants     map[string]*Participant
 	LocalParticipant *LocalParticipant
+	State            ParticipantState
 
 	signalingClient *SignalingClient
 	publisherPC     *webrtc.PeerConnection
@@ -31,6 +32,7 @@ func NewRoom(roomInfo RoomInfo, participantInfo ParticipantInfo, signalingClient
 		LocalParticipant: NewLocalParticipant(participantInfo),
 		signalingClient:  signalingClient,
 		subscriberPCs:    make(map[string]*webrtc.PeerConnection),
+		State:            ParticipantStateActive,
 	}
 
 	room.setupSignalingHandlers()
@@ -343,4 +345,65 @@ func (r *Room) Leave() error {
 	})
 
 	return nil
+}
+
+// Hold puts the room on hold
+func (r *Room) Hold() error {
+	if r.LocalParticipant == nil {
+		return fmt.Errorf("not connected to room")
+	}
+
+	// Pause all local tracks
+	for _, track := range r.LocalParticipant.PublishedTracks {
+		if err := track.Hold(); err != nil {
+			return fmt.Errorf("failed to hold track: %w", err)
+		}
+	}
+
+	// Send hold message to server
+	if err := r.signalingClient.Send(WSMessage{
+		Type: "room.hold",
+		Data: map[string]string{
+			"roomId":        r.ID,
+			"participantId": r.LocalParticipant.ID,
+		},
+	}); err != nil {
+		return err
+	}
+
+	r.State = ParticipantStateOnHold
+	return nil
+}
+
+// Resume resumes the room from hold
+func (r *Room) Resume() error {
+	if r.LocalParticipant == nil {
+		return fmt.Errorf("not connected to room")
+	}
+
+	// Send resume message to server
+	if err := r.signalingClient.Send(WSMessage{
+		Type: "room.resume",
+		Data: map[string]string{
+			"roomId":        r.ID,
+			"participantId": r.LocalParticipant.ID,
+		},
+	}); err != nil {
+		return err
+	}
+
+	// Resume all tracks
+	for _, track := range r.LocalParticipant.PublishedTracks {
+		if err := track.Resume(); err != nil {
+			return fmt.Errorf("failed to resume track: %w", err)
+		}
+	}
+
+	r.State = ParticipantStateActive
+	return nil
+}
+
+// IsOnHold returns whether the room is on hold
+func (r *Room) IsOnHold() bool {
+	return r.State == ParticipantStateOnHold
 }

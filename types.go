@@ -37,6 +37,15 @@ const (
 	TrackStatusStopped TrackStatus = "stopped"
 )
 
+// ParticipantState represents the state of a participant
+type ParticipantState string
+
+const (
+	ParticipantStateActive    ParticipantState = "active"
+	ParticipantStateOnHold    ParticipantState = "on_hold"
+	ParticipantStateInTransit ParticipantState = "in_transit"
+)
+
 // ConnectionState represents the state of the connection
 type ConnectionState string
 
@@ -74,6 +83,13 @@ type JoinOptions struct {
 	Video    bool
 	Role     RoomRole
 	Metadata map[string]interface{}
+}
+
+// ScreenShareOptions represents options for screen sharing
+type ScreenShareOptions struct {
+	FrameRate int
+	Width     int
+	Height    int
 }
 
 // RoomInfo represents information about a room

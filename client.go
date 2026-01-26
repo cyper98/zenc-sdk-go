@@ -171,6 +171,34 @@ func (c *Client) CreateAudioTrack(codec string) (*LocalTrack, error) {
 	), nil
 }
 
+// CreateScreenShareTrack creates a new screen share track
+func (c *Client) CreateScreenShareTrack(opts *ScreenShareOptions) (*LocalTrack, error) {
+	if opts == nil {
+		opts = &ScreenShareOptions{
+			FrameRate: 30,
+			Width:     1920,
+			Height:    1080,
+		}
+	}
+
+	// Create screen share track using WebRTC
+	track, err := webrtc.NewTrackLocalStaticRTP(
+		webrtc.RTPCodecCapability{MimeType: webrtc.MimeTypeVP8},
+		uuid.New().String(),
+		uuid.New().String(),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create screen share track: %w", err)
+	}
+
+	return NewLocalTrack(
+		track.ID(),
+		TrackKindVideo,
+		TrackSourceScreen,
+		track,
+	), nil
+}
+
 // GetCurrentRoom returns the current room
 func (c *Client) GetCurrentRoom() *Room {
 	return c.currentRoom
