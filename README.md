@@ -5,7 +5,7 @@ Go SDK for the Zenc livestreaming platform.
 ## Installation
 
 ```bash
-go get github.com/aminofox/zenc-sdk-go
+go get github.com/cyper98/zenc-sdk-go
 ```
 
 ## Quick Start
@@ -18,7 +18,7 @@ import (
 	"log"
 	"time"
 
-	zenc "github.com/aminofox/zenc-sdk-go"
+	zenc "github.com/cyper98/zenc-sdk-go"
 )
 
 func main() {
@@ -190,5 +190,5 @@ MIT
 ## Links
 
 - [Documentation](https://zenc.example.com/docs)
-- [GitHub](https://github.com/aminofox/zenc-sdk-go)
-- [Issues](https://github.com/aminofox/zenc-sdk-go/issues)
+- [GitHub](https://github.com/cyper98/zenc-sdk-go)
+- [Issues](https://github.com/cyper98/zenc-sdk-go/issues)

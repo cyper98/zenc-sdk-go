@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	zenc "github.com/aminofox/zenc-sdk-go"
+	zenc "github.com/cyper98/zenc-sdk-go"
 )
 
 func main() {
